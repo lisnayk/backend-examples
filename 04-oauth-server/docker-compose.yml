@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.8"
 services:
   nginx:
     image: nginx:alpine
@@ -45,23 +45,39 @@ services:
       - mysql-data:/var/lib/mysql
     restart: always
   pg:
-    image: postgres:latest
+    image: postgres:13-alpine
     environment:
       POSTGRES_USER: pguser
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: nestjs
     ports:
       - "5432:5432"
     restart: always
     volumes:
-      - pg-data:/var/lib/postgresql/data
+      - pg-data-01:/var/lib/postgresql/data
+      - ./infra/postgres:/docker-entrypoint-initdb.d
+  keycloak:
+    image: keycloak/keycloak
+    container_name: oauth
+    ports:
+      - 8080:8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - DB_VENDOR=postgres
+      - DB_ADDR=pg
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      - DB_PASSWORD=keycloak
+    command: [ "start-dev" ]
+    depends_on:
+      - pg
   adminer:
     image: adminer
     depends_on:
       - pg
     restart: always
     ports:
-      - 8080:8080
+      - 8001:8080
 volumes:
-  pg-data:
+  pg-data-01:
   mysql-data:
