@@ -71,6 +71,7 @@ services:
     command: [ "start-dev" ]
     depends_on:
       - pg
+      - adminer
   adminer:
     image: adminer
     depends_on:
