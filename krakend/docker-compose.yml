@@ -1,0 +1,40 @@
+version: '3'
+services:
+  ingress:
+    image: nginx
+    container_name: ingress
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/srv/www/static
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    environment:
+      SWAGGER_JSON: openapi.yaml
+      SWAGGER_JSON_URL: openapi.yaml
+    volumes:
+      - ./openapi/products-api.yaml:/usr/share/nginx/html/openapi.yaml
+    ports:
+      - "8081:8080"              # Expose Swagger-UI on port 8081
+  krakend:
+    image: devopsfaith/krakend
+    container_name: krakend
+    volumes:
+      - ./krakend:/etc/krakend   # Mount KrakenD configuration files
+    ports:
+      - "8080:8080"              # Expose KrakenD API on port 8080
+    command: [
+      "run", "-c", "/etc/krakend/krakend.json", "-d", "--port", "8080"
+    ]
+  
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    depends_on:
+      - krakend
+
+networks:
+  default:
+    driver: bridge

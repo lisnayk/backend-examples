@@ -5,6 +5,7 @@ import {CatsModule} from './cats/cats.module';
 import {TagsModule} from './tags/tags.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
 
 
 @Module({
@@ -23,6 +24,7 @@ import { CategoriesModule } from './categories/categories.module';
             autoLoadEntities: true,
         }),
         CategoriesModule,
+        ProductsModule,
     ],
     controllers: [AppController],
     providers: [AppService],
