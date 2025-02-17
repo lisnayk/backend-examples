@@ -14,7 +14,7 @@ import { ProductsModule } from './products/products.module';
         // TagsModule,
         TypeOrmModule.forRoot({
             type: 'postgres',
-            host: 'localhost',
+            host: 'pg',
             port: 5432,
             username: 'pguser',
             password: 'password',

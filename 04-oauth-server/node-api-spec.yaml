@@ -6,10 +6,16 @@ info:
 servers:
   - url: http://localhost:3000
     description: Main API Server
-
+  - url: http://localhost/node
+    description: Main API Server
 paths:
   /categories:
     get:
+      security:
+        - oAuth2AuthCode:
+          - 'openid'
+          - 'profile'
+          - 'email'
       tags:
         - Categories
       summary: Get all categories
@@ -238,6 +244,24 @@ paths:
           description: Product deleted successfully
 
 components:
+  securitySchemes:
+    oAuth2AuthCode:
+      type: oauth2
+      description: For more information, see https://api.slack.com/docs/oauth
+      flows:
+        authorizationCode:
+          authorizationUrl: http://localhost:8080/realms/znu/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8080/realms/znu/protocol/openid-connect/token
+          scopes:
+            openid: OpenID Connect
+            profile: Profile
+            email: Email
+        clientCredentials:
+          tokenUrl: http://localhost:8080/realms/znu/protocol/openid-connect/token
+          scopes:
+            openid: OpenID Connect
+            profile: Profile
+            email: Email
   schemas:
     Meta:
       type: object

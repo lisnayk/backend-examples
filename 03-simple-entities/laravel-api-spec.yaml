@@ -6,6 +6,8 @@ info:
 servers:
   - url: http://localhost:8000/api
     description: Main API Server
+  - url: http://localhost/php
+    description: Main API Server
 
 paths:
   /subscribers:
