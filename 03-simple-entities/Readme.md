@@ -1,49 +1,28 @@
-# Лабораторна робота №2-3 Створення RestFull Api за допомогою фреймворків Laravel та NestJS
+# Лабораторна робота №2 Створення RestFull Api за допомогою NestJS
 
-## Мета: Опановуння основних концепцій та паттернів розробки веб-додатків на прикладі фреймворків Laravel та NestJS.
+## Мета: Опановуння основних концепцій та паттернів розробки веб-додатків на прикладі фреймворку NestJS.
 
-### Теоритичні відомості
+### Теоретичні відомості
 
-#### OpenAPI
+**Node.js** — програмна платформа для розробки швидких і масштабованих web-додатків, клієнтська і серверна частина яких написані на JavaScript. 
+Node.js використовує рушій V8 від Google та перетворює JavaScript код в бінарний, який може працювати не тільки в браузері, але також в додатках на ПК або мобільних ОС.
+На практиці, Node.js застосовують як web-сервер через його подієво-орієнтовану модель та неблокуючу архітектури. 
+Все це фундаментальні можливості, для використання яких у вашому проєкті, потрібні надбудови вищого рівня, такі як фреймворк Nest.JS.
 
-Специфікація **OpenAPI** — це формат визначення мови, який використовується для опису RESTful API. Nest надає спеціальний модуль, який дозволяє генерувати таку специфікацію за допомогою декораторів.
-Щоб почати використовувати його, ми спочатку встановимо необхідну залежність.
+**Завдання фреймворку** — зробити розробку простіше, швидше і більш структурованою. Для Node.js є понад декілька десятків популярних фреймворків, заснованих, як і Nest.JS, на «стандартному» Express.JS. 
+Головна перевага Nest.JS в порівнянні з базовою платформою — чітка архітектура, що складається з трьох компонентів: 
+ - контролерів; 
+ - модулів;
+ - провайдерів (постачальників). 
+Завдяки їй додаток з самого початку розробки просто розділити на мікросервіси та працювати над кожним окремо, поєднуючи в єдину систему.
 
-```bash
-  npm install --save @nestjs/swagger swagger-ui-express
-```
-Після завершення процесу встановлення відкрийте main.js файл та ініціалізуйте Swagger за допомогою SwaggerModule класу:
+**NestJS** — фреймворк для створення серверних додатків Node.js. Це просте середовище з чіткою архітектурою і широкими можливостями, кількість користувачів якого постійно зростає.
+Nest.JS створений для розробки вимогливих і нестандартних систем, містить все необхідне щоб запустити проєкт.
+Підтримує інтеграцію будь-яких компонентів Express.JS, бібліотек і модулів TypeScript та JavaScript, а також багато іншого. 
 
-```js
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+[https://brander.ua/technologies/nestjs] 
 
-async function bootstrap() {
-   const app = await NestFactory.create(AppModule);
-
-   const config = new DocumentBuilder()
-           .setTitle('NestJs API Documentation')
-           .setDescription('Backend API for the NestJs application.')
-           .setVersion('1.0')
-           .addTag('Tags')
-           .build();
-
-   const document = SwaggerModule.createDocument(app, config);
-   SwaggerModule.setup('api', app, document);
-
-   await app.listen(3000);
-}
-bootstrap();
-
-```
-Під час роботи програми відкрийте браузер і перейдіть до http://localhost:3000/api/docs. Ви повинні побачити інтерфейс Swagger.  
-
-Як бачите, SwaggerModule автоматично відображаються всі ваші точку входу.
-
-Щоб створити та завантажити JSON-файл Swagger, перейдіть до http://localhost:3000/api-json (за умови, що ваша документація Swagger доступна в розділі http://localhost:3000/api)
-
-## Контроллери, постачальники та модулі
+## Контролери, постачальники та модулі
 
 **Контролери** відповідають за обробку вхідних запитів і повернення відповідей клієнту.
 
@@ -68,10 +47,11 @@ export class CatsController {
 }
 ```
 **Постачальники (providers)** є фундаментальним поняттям у Nest. Багато базових класів Nest можуть розглядатися як постачальники – служби, репозиторії, фабрики, помічники тощо. 
-Основна ідея провайдера полягає в тому, що його можна впровадити (inject) як залежність; 
-це означає, що об’єкти можуть створювати різні зв’язки один з одним, а функцію «з’єднання» цих об’єктів можна значною мірою делегувати Nest.
+Основна ідея провайдера полягає в тому, що його можна впровадити (inject) як залежність.
+Це означає, що об’єкти можуть створювати різні зв’язки один з одним, а функцію «з’єднання» цих об’єктів можна значною мірою делегувати фреймворку.
 
-Контролери повинні обробляти HTTP-запити та делегувати складніші завдання сервісам. 
+Контролери повинні обробляти HTTP-запити та делегувати складніші завдання сервісам.
+
 **Сервіс** — це звичайні класи JavaScript, які оголошуються як providers у модулі.
 
 Наприклад, CatsService відповідатиме за зберігання й пошук даних у CatsController, тому його можна визначити як постачальника.
@@ -96,7 +76,7 @@ export class CatsService {
 }
 ```
 
-**Ін'єкція залежності** - шаблону проектування,  що відповідає за впровадження залежностей. Наприклад, ви можете впровадити сервіс в контролер, щоб використовувати його функціональність.
+**Ін'єкція залежності** - шаблону проєктування, що відповідає за впровадження залежностей. Наприклад, ви можете впровадити сервіс в контролер, щоб використовувати його функціональність.
 
 ```ts
 
@@ -104,15 +84,14 @@ constructor(private catsService: CatsService) {}
 
 ```
 
-
-Модуль — це клас, анотований декоратором @Module(). Декоратор @Module() надає метадані, які Nest використовує для організації структури програми.
+**Модуль** — це клас, анотований декоратором @Module(). Декоратор @Module() надає метадані, які Nest використовує для організації структури програми.
 
 ![img.png](assets%2Fimg.png)
 
-Кожна програма має принаймні один модуль - кореневий. Кореневий модуль є відправною точкою, яку Nest використовує для побудови графіка додатка – внутрішньої структури даних, 
+Кожна програма має принаймні один модуль - кореневий. Кореневий модуль є відправною точкою, яку Nest використовує для побудови графа додатка – внутрішньої структури даних, 
 яку Nest використовує для вирішення зв’язків і залежностей між модулем і постачальником. 
 Хоча дуже маленькі програми теоретично можуть мати лише кореневий модуль, це не типовий випадок. Слід підкреслити, 
-що модулі настійно рекомендуються як ефективний спосіб організації ваших компонентів. Таким чином,
+що модулі рекомендуються як ефективний спосіб організації ваших компонентів. Таким чином,
 для більшості додатків результуюча архітектура буде використовувати кілька модулів, кожен з яких інкапсулює тісно пов’язаний набір можливостей.
 Декоратор @Module() бере один об’єкт, властивості якого описують модуль:
 
@@ -147,20 +126,22 @@ export class CatsModule {}
 
 ### Завдання
 
-1. Виконати клонування поточного проекту та встановити залежності.
-2. Запустити та ознайомитися з існуючими модулями та функціоналом.
-3. Встановити та налагодити роботу OpenAPI (Swagger), @nestjs/config.
-4. Використовуючи nest CLI Створити модулі, контролери, сервіси, для сутностей визначених у [специфікації openAPI](node-api-spec.yaml).
-5. Встановити та налагодити роботу TypeORM та підключити базу даних PostgreSQL.
-6. Створити необхідні TypeORM сутності (включаючи зв'язки) та реалізувати сервіси з використанням репозиторіїв.
-7. Самостійно опанувати документацію Laravel останньої версії та реалізувати аналогічний функціонал для сутності Subscriber згідно [специфікації](laravel-api-spec.yaml) та СКБД MySQL. 
-8. Завантажити проект до власного репозиторію з назвою за шаблоном `<vendor>/backend-labs-2` на GitHub/Bitbucket та надати посилання на нього у якості звіту.
+1. Ознайомитися з документацією NestJS та теоретичними відомостями лабораторної роботи.
+2. Створити новий проект за допомогою Nest CLI.
+3. Використовуючи nest CLI Створити модулі, контролери, сервіси, для сутностей визначених у [специфікації openAPI](node-api-spec.yaml).
+4. Встановити та налагодити роботу TypeORM та підключити базу даних PostgreSQL.
+5. Створити необхідні TypeORM сутності (включаючи зв'язки) та реалізувати сервіси з використанням репозиторіїв.
+6. Використовуючи пакет `nestjs-paginate` реалізувати пагінацію даних.
+7. Реалізувати валідацію даних та обробку помилок.
+8. Використовуючи пакет `nestjs-seeder` або `typeorm-seeding` заповнити базу даних тестовими даними.
+9. Перевірити відповідність спеціфікації OpenAPI та реалізованого API.
+10. Запустити проєкт разом с проксі-сервером та протестувати його роботу використовуючи тестовий фронтенд проєкт (необхідно виправити url в сервісах).
+11. Завантажити проєкт до власного репозиторію з назвою за шаблоном `<vendor>/backend-labs-2` на GitHub/Bitbucket та надати посилання на нього в якості звіту.
 
 **Посилань на Документацію**
 
 | Бібліотека | Посилання на документацію                                      |
 |-------------|----------------------------------------------------------------|
-| Laravel     | [Документація Laravel](https://laravel.com/docs)               |
 | TypeORM     | [Документація TypeORM](https://github.com/typeorm/typeorm)        |
 
 ### Контрольні питання
@@ -219,3 +200,15 @@ export class CatsModule {}
 ## Додаткові матеріали
 
 - https://medium.com/@abdullahirfan99_80517/mastering-database-migrations-in-nestjs-d1b586be3490
+- https://mailtrap.io/
+
+- https://chatgpt.com/c/67b4b5b3-8358-800a-bae2-998e65eec34f
+- https://habr.com/ru/articles/652867/
+- https://cloud.google.com/blog/topics/developers-practitioners/how-pubsub-eliminates-boring-meetings-and-makes-your-systems-scale
+- https://mermaid.js.org/syntax/sequenceDiagram.html
+- 
+- https://mermaid.live/edit#pako:eNpVUV1vgjAU_StNn1xiE0Bl4tui2UeWKBHNsoWXSi_QCK0rrWYx_vfBHSzb47nnnHt6bq800wLogjLGUmWlrWBBUrpbxiTm2RFsSlOF3AkhO4DlqSLEY_6sUybamQxIrA1KCfFDNvE7ZgWNlYpbqdUfehKwcIJG-HSgWuva1QcwP2w4ZRGufciOSl8qEEUNyv7TRCGLIgzglpNNnjcwRHvtqzz0b6EBcwYxEGE33G-fBnyPIcvXAc87HCfPA8aAbbLrse_hk9_XA8aGjy-_OGB-gDvfpBL60o-DOfOn2HZZQnZsXN0T02l7PszYm6IrGGup7NDQD9seEUaMNqfugA3hSrQ_IoRUxV2vigIWzGa_lxiduZH8UAGpQBW2RBkd0xpMzaVo__ja2VJqS6ghpZ1RQM5dhee7tVLurE6-VEYX1jgYU6NdUdJFzqumRe4kuIWV5IXh9SA5cfWhdd2Lbt__SrDT
+- https://jsonapi.org/
+
+
+[![](https://mermaid.ink/img/pako:eNqFksFqAjEQhl8lBLxZH2APgtBrhe7eyl5iNmrAzW6zSaFIoSr02F7K9tbSN6hFoVjUV5i8USeuolRqs5dJ5vtn_p1kSHmWCBrQQlxbobg4l6ynWRorgitn2kguc6YMaRFWkJbfD0RBIqFvJBfHWOixkHU60lxcHqcjn45sp-Ba5kZm6kSptmfbmZFdydkvNla1GoF3N4ZPWLl7mMMSlu6JuBEefbgxfiXxIYG1m8AUvl0JC8w8uBIxWMMKZhi-VG1bZ81mGBB427Nu4p733CNh1a83uBbMiKTShaiLvA7mGxMz7HBaVRl_hSnyK-y12FjcufFuS6yyhi83wsNF1Sb6315xMNOGOhja3mj7lNE_9bROU6FTJhN8JUNfLaamL1IR0wDDRHSZHZiYxuoOUWZNFt0qTgOjrahTndlenwZdNihwZ_MEp7B9YjsE7_oqy9ItdPcDL5ktZQ?type=png)](https://mermaid.live/edit#pako:eNqFksFqAjEQhl8lBLxZH2APgtBrhe7eyl5iNmrAzW6zSaFIoSr02F7K9tbSN6hFoVjUV5i8USeuolRqs5dJ5vtn_p1kSHmWCBrQQlxbobg4l6ynWRorgitn2kguc6YMaRFWkJbfD0RBIqFvJBfHWOixkHU60lxcHqcjn45sp-Ba5kZm6kSptmfbmZFdydkvNla1GoF3N4ZPWLl7mMMSlu6JuBEefbgxfiXxIYG1m8AUvl0JC8w8uBIxWMMKZhi-VG1bZ81mGBB427Nu4p733CNh1a83uBbMiKTShaiLvA7mGxMz7HBaVRl_hSnyK-y12FjcufFuS6yyhi83wsNF1Sb6315xMNOGOhja3mj7lNE_9bROU6FTJhN8JUNfLaamL1IR0wDDRHSZHZiYxuoOUWZNFt0qTgOjrahTndlenwZdNihwZ_MEp7B9YjsE7_oqy9ItdPcDL5ktZQ)

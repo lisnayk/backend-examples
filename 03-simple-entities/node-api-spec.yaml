@@ -36,12 +36,16 @@ paths:
               schema:
                 type: object
                 properties:
-                  items:
+                  data:
                     $ref: '#/components/schemas/Category'
                   meta:
                     $ref: '#/components/schemas/Meta'
+                  links:
+                    $ref: '#/components/schemas/Links'
         '404':
           description: 'No categories found'
+        500:
+          description: 'Internal server error'
     post:
       summary: Create a new category
       tags:
@@ -70,17 +74,22 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        200:
           description: A list of products
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
-        '404':
-          description: Category not found
-  
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  links:
+                    $ref: '#/components/schemas/Links'
+                  
+        404:
+          description: Not found
   /categories/{categoryId}:
     get:
       tags:
@@ -244,26 +253,60 @@ components:
     Meta:
       type: object
       properties:
-        totalItems:
-          type: integer
-          example: 0
-          description: Total number of items available
-        itemCount:
-          type: integer
-          example: 0
-          description: Number of items on the current page
         itemsPerPage:
           type: integer
-          example: 10
-          description: Number of items per page
-        totalPages:
+          example: 5
+        totalItems:
           type: integer
-          example: 0
-          description: Total number of pages available
+          example: 12
         currentPage:
           type: integer
-          example: 1
-          description: Current page number
+          example: 2
+        totalPages:
+          type: integer
+          example: 3
+        sortBy:
+          type: array
+          items:
+            type: array
+            items:
+              - type: string
+                example: color
+              - type: string
+                enum: [ASC, DESC]
+                example: DESC
+        search:
+          type: string
+          example: i
+        filter:
+          type: object
+          properties:
+            age:
+              type: string
+              example: "$gte:3"
+    Links:
+      type: object
+      properties:
+        first:
+          type: string
+          format: uri
+          example: "http://localhost:3000/cats?limit=5&page=1&sortBy=color:DESC&search=i&filter.age=$gte:3"
+        previous:
+          type: string
+          format: uri
+          example: "http://localhost:3000/cats?limit=5&page=1&sortBy=color:DESC&search=i&filter.age=$gte:3"
+        current:
+          type: string
+          format: uri
+          example: "http://localhost:3000/cats?limit=5&page=2&sortBy=color:DESC&search=i&filter.age=$gte:3"
+        next:
+          type: string
+          format: uri
+          example: "http://localhost:3000/cats?limit=5&page=3&sortBy=color:DESC&search=i&filter.age=$gte:3"
+        last:
+          type: string
+          format: uri
+          example: "http://localhost:3000/cats?limit=5&page=3&sortBy=color:DESC&search=i&filter.age=$gte:3"
     Category:
       type: object
       properties:
@@ -296,7 +339,7 @@ components:
       properties:
         id:
           readOnly: true
-          type: string
+          type: integer
           description: Unique identifier for the product
         name:
           type: string
@@ -313,7 +356,7 @@ components:
           format: uri
           description: URL to the image for the category
         category_id:
-          type: string
+          type: integer
           description: The ID of the category this product belongs to
         created_at:
           readOnly: true
