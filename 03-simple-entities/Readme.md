@@ -1,6 +1,6 @@
 # Лабораторна робота №2 Створення RestFull Api за допомогою NestJS
 
-## Мета: Опановуння основних концепцій та паттернів розробки веб-додатків на прикладі фреймворку NestJS.
+## Мета: Опанування основних концепцій та паттернів розробки вебдодатків на прикладі фреймворку NestJS.
 
 ### Теоретичні відомості
 
@@ -209,3 +209,5 @@ export class CatsModule {}
 - 
 - https://mermaid.live/edit#pako:eNpVUV1vgjAU_StNn1xiE0Bl4tui2UeWKBHNsoWXSi_QCK0rrWYx_vfBHSzb47nnnHt6bq800wLogjLGUmWlrWBBUrpbxiTm2RFsSlOF3AkhO4DlqSLEY_6sUybamQxIrA1KCfFDNvE7ZgWNlYpbqdUfehKwcIJG-HSgWuva1QcwP2w4ZRGufciOSl8qEEUNyv7TRCGLIgzglpNNnjcwRHvtqzz0b6EBcwYxEGE33G-fBnyPIcvXAc87HCfPA8aAbbLrse_hk9_XA8aGjy-_OGB-gDvfpBL60o-DOfOn2HZZQnZsXN0T02l7PszYm6IrGGup7NDQD9seEUaMNqfugA3hSrQ_IoRUxV2vigIWzGa_lxiduZH8UAGpQBW2RBkd0xpMzaVo__ja2VJqS6ghpZ1RQM5dhee7tVLurE6-VEYX1jgYU6NdUdJFzqumRe4kuIWV5IXh9SA5cfWhdd2Lbt__SrDT
 - https://jsonapi.org/
+- https://www.geeksforgeeks.org/node-js-frameworks/
+- NestJS Request Lifecycle: A Complete Guide to the Architecture https://medium.com/@daiki01240/nestjs-request-lifecycle-a-complete-guide-to-the-architecture-5ada9666867a 

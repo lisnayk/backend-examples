@@ -26,10 +26,11 @@ services:
     command: ["npm", "run", "start:dev"]
 
   php:
-    image: webdevops/php-apache-dev:8.2
+    image: webdevops/php-nginx:8.2
+    
     volumes:
       - ./php-app:/app
     ports:
-      - "8002:80"
+      - "8003:80"
     environment:
       WEB_DOCUMENT_ROOT: /app/public

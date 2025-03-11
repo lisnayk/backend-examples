@@ -21,7 +21,7 @@ paths:
           description: The page number to retrieve
           required: false
           schema:
-             type: integer
+            type: integer
         - in: query
           name: limit
           description: The page number to retrieve
@@ -87,7 +87,7 @@ paths:
                     $ref: '#/components/schemas/Meta'
                   links:
                     $ref: '#/components/schemas/Links'
-                  
+        
         404:
           description: Not found
   /categories/{categoryId}:
@@ -268,13 +268,9 @@ components:
         sortBy:
           type: array
           items:
-            type: array
-            items:
-              - type: string
-                example: color
-              - type: string
-                enum: [ASC, DESC]
-                example: DESC
+            type: string
+            enum: [ASC, DESC]
+            example: DESC
         search:
           type: string
           example: i
