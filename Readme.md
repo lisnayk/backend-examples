@@ -12,3 +12,4 @@
 1. [Лабораторна робота №1](02-nginx-nestjs-laravel%2FReadme.md)
 2. [Лабораторна робота №2](03-simple-entities%2FReadme.md)
 3. [Лабораторна робота №3](04-laravel%2FReadme.md)
+4. [Лабораторна робота №4](06-oauth-server%2FReadme.md)

@@ -54,3 +54,4 @@ Laravel внутрішньо використовує десятки поста�
 
 - [Laravel Request Lifecycle](https://medium.com/@ankitatejani84/laravel-request-lifecycle-7c2145aa1257)
 - [PHP Laravel Project Example for Beginners](https://phppot.com/php/php-laravel-project-example/)
+- [https://yaza-putu.github.io/laravel-service-repository-pattern-guide/guide/Installation.html](https://yaza-putu.github.io/laravel-service-repository-pattern-guide/guide/Installation.html)

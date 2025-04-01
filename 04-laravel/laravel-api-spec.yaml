@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: API to manage subscribers and their subscriptions.
 servers:
-  - url: http://localhost:8000/api
+  - url: http://localhost:8081/api
     description: Main API Server
   - url: http://localhost/php
     description: Main API Server
