@@ -179,3 +179,4 @@ Composite Roles — це роль, яка пов’язана з однією а
 - https://medium.com/devops-dudes/secure-nestjs-rest-api-with-keycloak-745ef32a2370
 - [keycloak-slides](https://github.com/malys/keycloak-slides)
 - [Цикл постов про Keycloak. Часть первая: Внедрение](https://habr.com/ru/articles/716232/)
+- https://www.digitalocean.com/community/tutorials/oauth-2-ru
