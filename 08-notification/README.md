@@ -1,0 +1,151 @@
+# 08-notification
+
+Приклад реалізації системи сповіщень з використанням NestJS, Keycloak та кількох баз даних.
+
+## Запуск проекту
+
+Для запуску проекту необхідно мати встановлений Docker та Docker Compose.
+
+1. Перейдіть до директорії проекту:
+   ```bash
+   cd 08-notification
+   ```
+
+2. Запустіть контейнери:
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Налаштування локального домену (hosts)**:
+   Оскільки проект використовує домен `demo-app.local`, вам необхідно додати його до вашого файлу `hosts`:
+   - **Windows**: Запустіть Блокнот від імені адміністратора та відкрийте файл `C:\Windows\System32\drivers\etc\hosts`. Додайте рядок:
+     ```text
+     127.0.0.1 demo-app.local
+     ```
+   - **Linux / macOS**: Виконайте команду в терміналі:
+     ```bash
+     sudo sh -c 'echo "127.0.0.1 demo-app.local" >> /etc/hosts'
+     ```
+
+4. Після запуску сервіси будуть доступні за наступними адресами:
+   - **Frontend (Nginx)**: [http://demo-app.local](http://demo-app.local)
+   - **Keycloak**: [http://demo-app.local/auth](http://demo-app.local/auth) (логін/пароль: `admin`/`admin`)
+   - **Node.js API (NestJS)**: [http://demo-app.local/node](http://demo-app.local/node)
+   - **Frontend (Dev Server)**: [http://localhost:5173](http://localhost:5173) (якщо запущено локально)
+   - **Swagger UI**: [http://demo-app.local/node/api-docs](http://demo-app.local/node/api-docs)
+   - **PHP (Laravel)**: [http://demo-app.local/php](http://demo-app.local/php)
+   - **Adminer**: [http://localhost:8001](http://localhost:8001) (або [http://demo-app.local:8001](http://demo-app.local:8001))
+
+## Конфігурація (.env)
+
+Проект використовує змінні середовища для налаштування підключень та безпеки.
+
+1. **Головний .env** (`08-notification/.env`): Містить спільні змінні для Docker Compose (паролі БД, налаштування Keycloak для контейнерів).
+2. **Node.js .env** (`08-notification/node-app/.env`): Містить налаштування специфічні для NestJS додатку.
+
+У файлах з'явилася нова змінна `APP_DOMAIN` (за замовчуванням `demo-app.local`), яка використовується для формування посилань у Swagger та налаштування мережі.
+
+Перед запуском ви можете змінити паролі та хости у цих файлах.
+
+## Бази даних
+
+У проекті використовуються дві системи керування базами даних (СКБД). Усі необхідні бази даних створюються автоматично при першому запуску.
+
+### PostgreSQL
+- **Хост**: `pg` (всередині мережі Docker) або `localhost:5432`
+- **Користувач**: `${POSTGRES_USER}`
+- **Пароль**: `${POSTGRES_PASSWORD}`
+- **Бази даних, що створюються**:
+  - `keycloak`: використовується для зберігання даних Keycloak.
+  - `nestjs`: використовується основним додатком Node.js.
+
+### MySQL
+- **Хост**: `mysql` (всередині мережі Docker) або `localhost:3309`
+- **Користувач**: `${MYSQL_USER}`
+- **Пароль**: `${MYSQL_PASSWORD}`
+- **Бази даних, що створюються**:
+  - `laravel`: використовується PHP додатком.
+
+## Схема онлайн автентифікації та авторизації ресурсів
+
+У даному проекті використовується онлайн-валідація токенів (`TokenValidation.ONLINE`). Це означає, що при кожному запиті додаток звертається до Keycloak для перевірки валідності токена та прав доступу до ресурсів.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as Користувач
+    participant Front as Frontend (Vue/React)
+    participant App as NestJS App
+    participant KC as Keycloak
+
+    Note over User, KC: Процес автентифікації (Online)
+    
+    User->>Front: Відкриття сторінки / Дія
+    Front->>KC: Перенаправлення на логін (якщо немає токена)
+    KC-->>Front: Повернення з кодом / JWT Токеном
+    
+    User->>Front: Запит даних
+    Front->>App: API Запит (з Bearer JWT)
+    
+    App->>KC: Перевірка токена (Introspection Request)
+    KC-->>App: Токен валідний + дані користувача
+    
+    Note over User, KC: Процес авторизації ресурсів (Resource Guard)
+    
+    App->>KC: Запит на перевірку дозволів (RPT Request / Enforcer)
+    Note right of App: Перевіряються @Resource та @Scopes
+    KC-->>App: Дозвіл надано/відхилено
+    
+    alt Доступ дозволено
+        App-->>Front: 200 OK + Дані ресурсу
+        Front-->>User: Відображення даних
+    else Доступ заборонено
+        App-->>Front: 403 Forbidden
+        Front-->>User: Повідомлення про помилку
+    end
+```
+
+### Пояснення до схеми:
+1. **Автентифікація**: Додаток отримує JWT токен від користувача та надсилає його в Keycloak на ендпоінт інтроспекції для підтвердження того, що токен не відкликаний і є актуальним.
+2. **Авторизація ресурсів**: `ResourceGuard` у NestJS використовує декоратори `@Resource` та `@Scopes` для формування запиту до Keycloak Policy Enforcer. Keycloak перевіряє, чи має даний користувач права на виконання вказаної дії з ресурсом.
+
+## Схема офлайн автентифікації та RBAC авторизації
+
+При використанні офлайн-валідації (`TokenValidation.OFFLINE`), додаток перевіряє підпис JWT токена локально за допомогою публічного ключа Keycloak. Для авторизації за ролями (RBAC) використовується `RoleGuard`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User as Користувач
+    participant Front as Frontend (Vue/React)
+    participant App as NestJS App
+    participant KC as Keycloak
+
+    Note over User, KC: Процес автентифікації (Offline)
+    
+    User->>Front: Відкриття сторінки / Дія
+    Front->>KC: Перенаправлення на логін
+    KC-->>Front: Повернення з JWT Токеном
+    
+    User->>Front: Запит даних
+    Front->>App: API Запит (з Bearer JWT)
+    
+    Note right of App: Локальна перевірка JWT (Public Key)
+    Note right of App: Перевірка терміну дії (exp)
+    
+    Note over User, KC: Процес RBAC авторизації (Role Guard)
+    
+    Note right of App: Перевірка @Roles у токені
+    
+    alt Роль присутня
+        App-->>Front: 200 OK + Дані
+        Front-->>User: Відображення даних
+    else Ролі недостатньо
+        App-->>Front: 403 Forbidden
+        Front-->>User: Повідомлення про помилку
+    end
+```
+
+### Пояснення до схеми:
+1. **Автентифікація (Офлайн)**: Додаток не звертається до Keycloak при кожному запиті. Він використовує заздалегідь отриманий публічний ключ (`realmPublicKey`) для перевірки підпису токена та перевіряє стандартні поля (issuer, expiration тощо).
+2. **RBAC авторизація**: `RoleGuard` перевіряє наявність необхідних ролей (наприклад, `admin`, `user`) безпосередньо у розкодованому JWT токені (секція `realm_access.roles` або `resource_access`). Це значно швидше, оскільки не потребує мережевих запитів.
