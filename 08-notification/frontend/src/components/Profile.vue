@@ -87,6 +87,33 @@ export default {
                 </span>
               </div>
             </div>
+            
+            <div v-if="user.roles && user.roles.length > 0" class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <span class="text-gray-400 text-xs font-bold uppercase tracking-widest block mb-2">Глобальні ролі (Realm)</span>
+              <div class="flex flex-wrap gap-2">
+                <span v-for="role in user.roles" :key="role" 
+                      class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-md border border-blue-200">
+                  {{ role }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Клієнтські ролі -->
+          <div v-if="user.resourceRoles && Object.keys(user.resourceRoles).length > 0" class="space-y-4">
+            <label class="text-sm font-bold text-gray-500 ml-1 uppercase tracking-wider">Ролі додатків (Client Roles)</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div v-for="(client, clientName) in user.resourceRoles" :key="clientName" 
+                   class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                <span class="text-indigo-600 text-xs font-black uppercase tracking-tighter block mb-2">{{ clientName }}</span>
+                <div class="flex flex-wrap gap-2">
+                  <span v-for="role in client.roles" :key="role" 
+                        class="px-2 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded border border-indigo-100">
+                    {{ role }}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
           
           <div class="space-y-4">

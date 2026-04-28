@@ -11,6 +11,9 @@ services:
     depends_on:
       - php
       - nodejs
+      - notification
+      - frontend
+      - rabbitmq
       - mysql
       - pg
     networks:
@@ -39,7 +42,49 @@ services:
       - ./node-app:/home/app
     depends_on:
       - php
+      - rabbitmq
     command: ["npm", "run", "start:dev"]
+  notification:
+    image: node:alpine
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      APP_DOMAIN: ${APP_DOMAIN:-demo-app.local}
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASS: ${MAIL_PASS}
+      PUSHER_APP_ID: ${PUSHER_APP_ID}
+      PUSHER_KEY: ${PUSHER_KEY}
+      PUSHER_SECRET: ${PUSHER_SECRET}
+      PUSHER_CLUSTER: ${PUSHER_CLUSTER}
+    working_dir: /home/app
+    restart: always
+    ports:
+      - "${NOTIFICATION_PORT:-3001}:3000"
+    volumes:
+      - ./notification:/home/app
+    depends_on:
+      - rabbitmq
+    command: ["npm", "run", "start:dev"]
+  frontend:
+    image: node:22-alpine
+    working_dir: /home/app
+    ports:
+      - "5174:5174"
+    volumes:
+      - ./frontend:/home/app
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    restart: always
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
   php:
     image: webdevops/php-apache-dev:8.2
     ports:

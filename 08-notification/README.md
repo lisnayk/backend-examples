@@ -149,3 +149,55 @@ sequenceDiagram
 ### Пояснення до схеми:
 1. **Автентифікація (Офлайн)**: Додаток не звертається до Keycloak при кожному запиті. Він використовує заздалегідь отриманий публічний ключ (`realmPublicKey`) для перевірки підпису токена та перевіряє стандартні поля (issuer, expiration тощо).
 2. **RBAC авторизація**: `RoleGuard` перевіряє наявність необхідних ролей (наприклад, `admin`, `user`) безпосередньо у розкодованому JWT токені (секція `realm_access.roles` або `resource_access`). Це значно швидше, оскільки не потребує мережевих запитів.
+
+## Архітектура системи
+
+Проект побудований на мікросервісній архітектурі з використанням подій (Event-Driven Architecture).
+
+### Компоненти системи:
+
+- **Frontend (Vue 3)**: Клієнтський додаток, що використовує Vite для збірки, Pinia для керування станом та Keycloak для автентифікації. Підключений до Pusher для отримання миттєвих сповіщень.
+- **Node-App (NestJS)**: Основний бекенд-сервіс (API). Працює з базою даних PostgreSQL. При створенні нових ресурсів (наприклад, категорій) він не відправляє сповіщення самостійно, а публікує подію в RabbitMQ.
+- **Notification Service (NestJS)**: Спеціалізований мікросервіс для обробки сповіщень. Він слухає чергу в RabbitMQ і виконує дві дії:
+  - Відправляє Email через SMTP (Mailtrap у режимі розробки).
+  - Надсилає подію в Pusher для миттєвого відображення на фронтенді.
+- **RabbitMQ**: Брокер повідомлень, що забезпечує асинхронний зв'язок між сервісами. Це дозволяє основному API працювати швидше, не чекаючи завершення відправки пошти.
+- **Nginx**: Виступає в ролі Reverse Proxy, забезпечуючи єдину точку входу для всіх сервісів через домен `demo-app.local`.
+
+### Схема взаємодії компонентів:
+
+```mermaid
+graph TD
+    User([Користувач]) -->|HTTP| Nginx{Nginx Proxy}
+    
+    subgraph "Public Zone"
+        Nginx -->|/| FE[Frontend - Vue 3]
+        Nginx -->|/auth| KC[Keycloak - IAM]
+        Nginx -->|/node| BE[Node-App - NestJS API]
+    end
+
+    subgraph "Service Zone"
+        BE -->|Save| DB[(PostgreSQL)]
+        BE -->|Emit Event| RMQ[RabbitMQ]
+        
+        RMQ -->|Consume| NS[Notification Service]
+        
+        NS -->|Send| SMTP[SMTP / Mailtrap]
+        NS -->|Trigger| PSH[Pusher Service]
+    end
+
+    PSH -.->|Websocket| FE
+    
+    style RMQ fill:#ff6600,stroke:#fff,stroke-width:2px,color:#fff
+    style NS fill:#e0234e,stroke:#fff,stroke-width:2px,color:#fff
+    style BE fill:#e0234e,stroke:#fff,stroke-width:2px,color:#fff
+    style FE fill:#42b883,stroke:#fff,stroke-width:2px,color:#fff
+```
+
+### Процес створення категорії:
+1. Користувач створює категорію у **Frontend**.
+2. **Node-App** перевіряє права через **Keycloak**, зберігає дані в **PostgreSQL**.
+3. **Node-App** надсилає повідомлення `category_created` у **RabbitMQ**.
+4. **Notification Service** отримує повідомлення з черги.
+5. **Notification Service** одночасно відправляє лист адміністратору та сигнал у **Pusher**.
+6. **Frontend**, що підписаний на канал Pusher, отримує сигнал і показує спливаюче повідомлення (Toast) користувачу.

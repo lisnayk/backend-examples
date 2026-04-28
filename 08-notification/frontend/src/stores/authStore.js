@@ -26,6 +26,10 @@ export const useAuthStore = defineStore({
         this.user.id = keycloak.idTokenParsed.sub;
         this.user.token = keycloak.token;
         this.user.refToken = keycloak.refreshToken;
+        
+        // Store roles
+        this.user.roles = keycloak.realmAccess?.roles || [];
+        this.user.resourceRoles = keycloak.resourceAccess || {};
       }
     },
     // Logout user

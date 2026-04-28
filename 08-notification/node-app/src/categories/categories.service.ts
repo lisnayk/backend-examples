@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
 import { DeleteResult, Repository } from 'typeorm';
@@ -7,16 +7,21 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class CategoriesService {
     constructor(
         @InjectRepository(Category)
         private repository: Repository<Category>,
+        @Inject('NOTIFICATION_SERVICE')
+        private client: ClientProxy,
     ) {}
 
-    public create(categoryData: Category): Promise<Category> {
-        return this.repository.save(categoryData);
+    public async create(categoryData: Category): Promise<Category> {
+        const category = await this.repository.save(categoryData);
+        this.client.emit('category_created', category);
+        return category;
     }
 
     public findAll(): Promise<Category[]> {

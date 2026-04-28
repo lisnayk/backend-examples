@@ -1,3 +1,22 @@
+<script setup>
+import { onMounted, onUnmounted } from 'vue';
+import { useToast } from 'vue-toastification';
+import pusher from '@/services/pusher';
+
+const toast = useToast();
+
+onMounted(() => {
+  const channel = pusher.subscribe('notifications');
+  channel.bind('category-created', (data) => {
+    toast.success(`${data.message}\n${data.description}` || 'Нова категорія створена!');
+  });
+});
+
+onUnmounted(() => {
+  pusher.unsubscribe('notifications');
+});
+</script>
+
 <template>
   <div class="min-h-screen flex flex-col">
     <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -19,6 +38,13 @@
               Головна
             </router-link>
             <template v-if="$store?.authenticated">
+              <router-link 
+                to="/categories" 
+                class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+                active-class="text-blue-600 bg-blue-50"
+              >
+                Категорії
+              </router-link>
               <router-link 
                 to="/profile" 
                 class="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors"

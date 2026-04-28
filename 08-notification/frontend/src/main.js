@@ -5,6 +5,8 @@ import App from './App.vue';
 import router from './router';
 import keycloakService from '@services/keycloak';
 import setupInterceptors from '@services/tokenInterceptors';
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 // Styles
 import './assets/main.css';
@@ -19,6 +21,7 @@ pinia.use(piniaPluginPersistedstate);
 const renderApp = () => {
   const app = createApp(App);
   app.use(pinia);
+  app.use(Toast);
   
   // Initialize Auth Store
   const store = useAuthStore();

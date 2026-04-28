@@ -77,9 +77,9 @@ export class CategoriesController {
     status: 200,
     description: 'The category has been successfully deleted.',
   })
-  delete(@Param('id') id: number): void {
-    const deleted = this.categoriesService.remove(id);
-    if (!deleted) {
+  async delete(@Param('id') id: number): Promise<void> {
+    const result = await this.categoriesService.remove(id);
+    if (result.affected === 0) {
       throw new NotFoundException(`Category #${id} not found`);
     }
   }

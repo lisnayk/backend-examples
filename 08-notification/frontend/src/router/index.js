@@ -3,6 +3,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 // COMPONENTS
 import Home from '@components/Home.vue';
+import Categories from '@components/Categories.vue';
 import LogoutRedirect from '@components/Logout.vue';
 import Profile from '@components/Profile.vue';
 import AuthCallback from '@components/AuthCallback.vue';
@@ -12,6 +13,12 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/categories",
+    name: "Categories",
+    component: Categories,
     meta: { requiresAuth: true }
   },
   {
